@@ -1,18 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:myapp/core/enum/fishbone_type.dart';
 import 'package:myapp/core/enum/shape_type.dart';
 import 'package:myapp/domain/entities/circle_shape.dart';
+import 'package:myapp/domain/entities/fishbone_shape.dart';
 import 'package:myapp/domain/entities/square_shape.dart';
 import 'package:myapp/presentantion/providers/drawing_provider.dart';
 import 'package:myapp/presentantion/widgets/drawing_button.dart';
+import 'package:myapp/presentantion/widgets/shape_details_panel.dart';
 import 'package:provider/provider.dart';
 
-class MapScreen extends StatelessWidget {
+class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
 
   @override
+  State<MapScreen> createState() => _MapScreenState();
+}
+
+class _MapScreenState extends State<MapScreen> {
+  @override
   Widget build(BuildContext context) {
+  final MapController _mapController = MapController();
+  bool _isMapReady = false;
+  bool _isPanelVisible = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // _mapController = MapController();
+  }
+
+
     return Scaffold(
       // appBar: AppBar(
       //   title: const Text('Map Drawing'),
@@ -21,6 +40,7 @@ class MapScreen extends StatelessWidget {
       body: Stack(
         children: [
           FlutterMap(
+            mapController: _mapController,
             options: MapOptions(
               onTap: (_, point) {
                 final provider = context.read<DrawingProvider>();
@@ -29,11 +49,21 @@ class MapScreen extends StatelessWidget {
                 }
               },
               onPointerHover: (event, point) {
+                print("event==========>${event}");
+
                 final provider = context.read<DrawingProvider>();
                 if (provider.currentShape != ShapeType.none) {
                   provider.updateCursor(point);
                 }
+
+                print("point==========>${point}");
               },
+               onMapReady: () {
+                print("=============     called   =========");
+                      setState(() {
+                        _isMapReady = true;
+                      });
+                    },
             ),
             children: [
               TileLayer(
@@ -45,21 +75,8 @@ class MapScreen extends StatelessWidget {
                 builder: (context, provider, _) {
                   return PolylineLayer(
                     polylines: [
-                      ...provider.shapes.map((shape) {
-                        List<LatLng> points;
-                        if (shape is SquareShape) {
-                          points = shape.getSquarePoints();
-                        } else if (shape is CircleShape) {
-                          points = shape.getCirclePoints();
-                        } else {
-                          points = shape.points;
-                        }
-                        return Polyline(
-                          points: points,
-                          strokeWidth: 2.0,
-                          color: Colors.blue,
-                        );
-                      }),
+                      ...provider.shapes
+                          .expand((shape) => shape.getPolylines()),
                       if (provider.currentPoints.isNotEmpty)
                         Polyline(
                           points: provider.currentPoints,
@@ -70,27 +87,28 @@ class MapScreen extends StatelessWidget {
                   );
                 },
               ),
+           if (   _isPanelVisible) // Add condition here
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              child: ShapeDetailsPanel(mapController: _mapController),
+            ),
             ],
           ),
-          // const Positioned(
-          //   bottom: 16,
-          //   left: 16,
-          //   child: Column(
-          //     children: [
-          //       DrawingButton(
-          //         icon: Icons.line_axis,
-          //         label: 'Line',
-          //         shapeType: ShapeType.line,
-          //       ),
-          //         SizedBox(height: 8),
-          //       DrawingButton(
-          //         icon: Icons.square_outlined,
-          //         label: 'Square',
-          //         shapeType: ShapeType.square,
-          //       ),
-          //     ],
-          //   ),
-          // ),
+
+          Positioned(
+            top: 0,
+            right: 0,
+            
+            child:  IconButton(
+              icon: Icon(_isPanelVisible ? Icons.chevron_right : Icons.chevron_left),
+              onPressed: () {
+                setState(() {
+                  _isPanelVisible = !_isPanelVisible;
+                });
+              },
+              tooltip: _isPanelVisible ? 'Hide Panel' : 'Show Panel',
+            ),)
+         
           // Consumer<DrawingProvider>(
           //   builder: (context, provider, _) {
           //     final details = provider.getCurrentShapeDetails();
@@ -119,3 +137,4 @@ class MapScreen extends StatelessWidget {
     );
   }
 }
+

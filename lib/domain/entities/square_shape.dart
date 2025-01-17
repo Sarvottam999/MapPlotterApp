@@ -1,8 +1,10 @@
 // import 'package:helloworld/core/enums/shape_type.dart';
 // import 'package:helloworld/domain/entities/shape.dart';
+import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:myapp/core/enum/shape_type.dart';
 import 'package:myapp/domain/entities/shape.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 class SquareShape extends Shape {
   SquareShape({required List<LatLng> points})
@@ -62,4 +64,15 @@ class SquareShape extends Shape {
 
     return details;
   }
+
+  @override
+List<Polyline> getPolylines() {
+  return [
+    Polyline(
+      points: getSquarePoints(), // or points for line, getSquarePoints() for square, etc.
+      strokeWidth: 2.0,
+      color: Colors.blue,
+    ),
+  ];
+}
 }

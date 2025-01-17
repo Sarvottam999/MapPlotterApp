@@ -9,12 +9,14 @@ class DrawingButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final ShapeType shapeType;
+   final  Widget? image;
 
-  const DrawingButton({
+    DrawingButton({
     Key? key,
     required this.icon,
     required this.label,
     required this.shapeType,
+      this.image
   }) : super(key: key);
 
   @override
@@ -30,11 +32,11 @@ class DrawingButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(7),
             // border: Border.all(width: 2),
             // shape: BoxShape.circle,
-            color: isSelected ? Colors.indigo[50] : Colors.white,
+            color: isSelected ? Color.fromARGB(255, 178, 176, 226) : Colors.white,
             // col: Colors.white,
           ),
           child: IconButton(
-            icon: Icon(icon, size: 20, color: Colors.indigo),
+            icon: image ??   Icon(icon, size: 20, color: Colors.black),
             onPressed: () {
               provider.setCurrentShape(isSelected ? ShapeType.none : shapeType);
             },

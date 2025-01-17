@@ -3,6 +3,7 @@
 import 'package:latlong2/latlong.dart';
 import 'package:myapp/core/enum/shape_type.dart';
 import 'package:myapp/domain/entities/shape.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 class LineShape extends Shape {
   LineShape({required List<LatLng> points})
@@ -42,4 +43,15 @@ class LineShape extends Shape {
 
     return details;
   }
+
+  @override
+List<Polyline> getPolylines() {
+  return [
+    Polyline(
+      points: points, // or points for line, getSquarePoints() for square, etc.
+      strokeWidth: 2.0,
+      // color: Colors.blue,
+    ),
+  ];
+}
 }

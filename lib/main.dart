@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:myapp/core/enum/fishbone_type.dart';
 import 'package:myapp/core/enum/shape_type.dart';
 import 'package:myapp/presentantion/providers/drawing_provider.dart';
 import 'package:myapp/presentantion/screens/map_screen.dart';
 import 'package:myapp/presentantion/widgets/drawing_button.dart';
+import 'package:myapp/presentantion/widgets/shape_details_panel.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -20,18 +22,21 @@ class DrawingApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => DrawingProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Map Drawing App',
-        theme: ThemeData(primarySwatch: Colors.blue),
-        home: const DrawingScreen(),
+      child: SafeArea(
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Map Drawing App',
+          theme: ThemeData(primarySwatch: Colors.blue),
+          home:   DrawingScreen(),
+        ),
       ),
     );
   }
 }
 
 class DrawingScreen extends StatelessWidget {
-  const DrawingScreen({super.key});
+    DrawingScreen({super.key});
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +47,16 @@ class DrawingScreen extends StatelessWidget {
           MapScreen(),
           sideBaar(),
           bottomBar(),
+          topRightBar(),
+           Positioned(
+              bottom: 16,
+      left: 0,
+      right: 0,
+              child: _buildFishboneTypeSelector(context)),      
+
+
+
+
         ],
       ),
     );
@@ -56,9 +71,12 @@ class DrawingScreen extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+
+  
             Consumer<DrawingProvider>(
               builder: (context, provider, _) {
                 final details = provider.getCurrentShapeDetails();
+                print("details=============>${details}");
                 if (details == null) return const SizedBox();
 
                 return Container(
@@ -83,66 +101,6 @@ class DrawingScreen extends StatelessWidget {
                 );
               },
             ),
-            // Container(
-            //   decoration: BoxDecoration(
-            //     color: Colors.white,
-            //     borderRadius: BorderRadius.circular(12),
-            //     boxShadow: [
-            //       BoxShadow(
-            //         color: Colors.black.withOpacity(0.1),
-            //         spreadRadius: 1,
-            //         blurRadius: 10,
-            //         offset: const Offset(0, 2),
-            //       ),
-            //     ],
-            //   ),
-            //   // color: Colors.white,
-            //   child: Padding(
-            //     padding:
-            //         const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            //     child: Row(
-            //       children: [
-            //         IconButton(
-            //           icon: const Icon(Icons.remove, size: 16),
-            //           onPressed: () {},
-            //         ),
-            //         const Text('93%', style: TextStyle(fontSize: 14)),
-            //         IconButton(
-            //           icon: const Icon(Icons.add, size: 16),
-            //           onPressed: () {},
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
-            // const SizedBox(width: 16),
-            // Container(
-            //   decoration: BoxDecoration(
-            //     color: Colors.white,
-            //     borderRadius: BorderRadius.circular(12),
-            //     boxShadow: [
-            //       BoxShadow(
-            //         color: Colors.black.withOpacity(0.1),
-            //         spreadRadius: 1,
-            //         blurRadius: 10,
-            //         offset: const Offset(0, 2),
-            //       ),
-            //     ],
-            //   ),
-            //   // color: Colors.white,
-            //   child: Row(
-            //     children: [
-            //       IconButton(
-            //         icon: const Icon(Icons.chevron_left, size: 16),
-            //         onPressed: () {},
-            //       ),
-            //       IconButton(
-            //         icon: const Icon(Icons.chevron_right, size: 16),
-            //         onPressed: () {},
-            //       ),
-            //     ],
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -188,8 +146,59 @@ class DrawingScreen extends StatelessWidget {
                   label: 'Circle',
                   shapeType: ShapeType.circle,
                 ),
-                _toolButton(Icons.open_with),
-                Consumer<DrawingProvider>(
+                
+                 
+                 
+             
+                DrawingButton(
+                  icon: Icons.living,
+                  image: Image.asset("assets/images/1.png", height: 30, width: 30,),
+                  label: 'Circle',
+                  shapeType: ShapeType.fishbone,
+                ), 
+                //  DrawingButton(
+                //   icon: Icons.living,
+                //   image: Image.asset("assets/images/2.png", height: 30, width: 30,),
+                //   label: 'Circle',
+                //   shapeType: ShapeType.fishbone,
+                // ), 
+              ],
+
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+ 
+
+   Positioned topRightBar() {
+    return Positioned(
+      top: 5,
+      right: 300,
+      // bottom: 0,
+      child: Center(
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 255, 255, 255),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+              
+Consumer<DrawingProvider>(
                   builder: (context, provider, _) => IconButton(
                     icon: const Icon(Icons.redo),
                     onPressed: provider.canRedo ? provider.redo : null,
@@ -209,143 +218,53 @@ class DrawingScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                // _toolButton(Icons.remove),
-                // _selectedToolButton(Icons.edit),
-                // _toolButton(Icons.text_fields),
-                // _toolButton(Icons.image),
-                // _toolButton(Icons.link),
-                // _toolButton(Icons.group),
               ],
+
             ),
           ),
+      ),
+      ),
+    );
+  }
+
+ 
+ Widget _buildFishboneTypeSelector(BuildContext context) {
+  return Consumer<DrawingProvider>(
+    builder: (context, provider, _) {
+      if (provider.currentShape != ShapeType.fishbone) return SizedBox();
+
+      return Container(
+        width: 100,
+         decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(2.5))
         ),
-      ),
-    );
-  }
-
-  Widget _toolButton(IconData icon) {
-    return IconButton(
-      icon: Icon(icon, size: 20),
-      onPressed: () {},
-    );
-  }
-
-  Widget _selectedToolButton(IconData icon) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.indigo[50],
-        borderRadius: BorderRadius.circular(7),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 20, color: Colors.indigo),
-        onPressed: () {},
-      ),
-    );
-  }
-
-  Widget _circleButton() {
-    return IconButton(
-      icon: Container(
-        width: 20,
-        height: 20,
-        decoration: BoxDecoration(
-          border: Border.all(width: 2),
-          shape: BoxShape.circle,
+        child: Column(
+          children: [
+            Text('Fishbone Type:', style: TextStyle(fontWeight: FontWeight.bold)),
+            ...FishboneType.values.map(
+              (type) => RadioListTile<FishboneType>(
+                title: Text(type.name),
+                value: type,
+                groupValue: provider.currentFishboneType,
+                onChanged: (FishboneType? value) {
+                  if (value != null) {
+                    provider.setFishboneType(value);
+                  }
+                },
+              ),
+            ),
+          ],
         ),
-      ),
-      onPressed: () {},
-    );
-  }
-
-  Widget _buildSection(String title, Widget content) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        content,
-      ],
-    );
-  }
-
-  Widget _buildColorPicker(List<Color> colors) {
-    return Wrap(
-      spacing: 8,
-      children: colors.map((color) {
-        return Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(4),
-            border: color == Colors.white
-                ? Border.all(color: Colors.grey[300]!)
-                : null,
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildStrokeWidthPicker() {
-    return Row(
-      children: [
-        _strokeWidthButton(1),
-        const SizedBox(width: 8),
-        _strokeWidthButton(2),
-        const SizedBox(width: 8),
-        _strokeWidthButton(3),
-      ],
-    );
-  }
-
-  Widget _strokeWidthButton(double height) {
-    return Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Center(
-        child: Container(
-          width: 16,
-          height: height,
-          color: Colors.grey[400],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLayerControls() {
-    return Row(
-      children: [
-        _layerButton(Icons.chevron_left),
-        const SizedBox(width: 8),
-        _layerButton(Icons.keyboard_arrow_up),
-        const SizedBox(width: 8),
-        _layerButton(Icons.keyboard_arrow_down),
-        const SizedBox(width: 8),
-        _layerButton(Icons.chevron_right),
-      ],
-    );
-  }
-
-  Widget _layerButton(IconData icon) {
-    return Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Icon(icon, size: 16),
-    );
-  }
+      );
+    },
+  );
 }
+
+
+ 
+
+ 
+}
+
+
