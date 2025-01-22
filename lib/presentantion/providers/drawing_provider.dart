@@ -15,6 +15,25 @@ class DrawingProvider with ChangeNotifier {
   LatLng? _currentCursor;
   FishboneType _currentFishboneType = FishboneType.normal;
 
+  // for edit and delete
+  // Shape? selectedShape;
+  bool isSelectionMode = false;
+  bool isEditMode = false;
+  int? selectedPointIndex;
+
+  // ---
+    Shape? _selectedShape;
+
+  bool _isEditing = false;
+    bool get isEditing => _isEditing;
+      Shape? get selectedShape => _selectedShape;
+
+
+
+  
+
+
+
 
   // Undo/Redo stacks
   final List<List<Shape>> _undoStack = [];
@@ -35,7 +54,16 @@ class DrawingProvider with ChangeNotifier {
   }
 
 
+  // void setCurrentShape(ShapeType type) {
+  //   _currentShape = type;
+  //   _currentPoints = [];
+  //   notifyListeners();
+  // }
   void setCurrentShape(ShapeType type) {
+    if (_isEditing) {
+      _isEditing = false;
+      _selectedShape = null;
+    }
     _currentShape = type;
     _currentPoints = [];
     notifyListeners();
@@ -136,5 +164,81 @@ class DrawingProvider with ChangeNotifier {
     }
 
     return details;
+  }
+
+
+  //  edit delete  =====================   Add these new methods
+  void toggleSelectionMode() {
+    isSelectionMode = !isSelectionMode;
+    if (!isSelectionMode) {
+      _selectedShape = null;
+    }
+    _currentShape = ShapeType.none;
+    notifyListeners();
+  }
+
+  // void selectShape(Shape? shape) {
+  //   selectedShape = shape;
+  //   notifyListeners();
+  // }
+   void selectShape(Shape? shape) {
+    _selectedShape = shape;
+    _isEditing = true;
+    _currentShape = ShapeType.none;
+    notifyListeners();
+  }
+
+
+  // void deleteSelectedShape() {
+  //   if (selectedShape != null) {
+  //     _shapes.remove(selectedShape);
+  //     selectedShape = null;
+  //     notifyListeners();
+  //   }
+  // }
+  // --------------------------------
+  void cancelEdit() {
+    _selectedShape = null;
+    _isEditing = false;
+    notifyListeners();
+  }
+
+  void updateShapePoints(List<LatLng> newPoints) {
+    if (_selectedShape != null) {
+      int index = _shapes.indexOf(_selectedShape!);
+      if (index != -1) {
+        _shapes[index].points = newPoints;
+        notifyListeners();
+      }
+    }
+  }
+
+  void deleteSelectedShape() {
+    if (_selectedShape != null) {
+      _shapes.remove(_selectedShape);
+      _selectedShape = null;
+      _isEditing = false;
+      notifyListeners();
+    }
+  }
+
+  // =================  edit shape ======================
+  // Add new methods
+  void startEditing() {
+    isEditMode = true;
+    notifyListeners();
+  }
+
+  void stopEditing() {
+    isEditMode = false;
+    selectedPointIndex = null;
+    notifyListeners();
+  }
+
+  void updatePointPosition(LatLng newPosition) {
+    if (selectedShape != null && selectedPointIndex != null) {
+      selectedShape!.points[selectedPointIndex!] = newPosition;
+      notifyListeners();
+    }
   }
 }

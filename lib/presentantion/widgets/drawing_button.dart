@@ -26,20 +26,29 @@ class DrawingButton extends StatelessWidget {
         final isSelected = provider.currentShape == shapeType;
 
         return Container(
-          // width: 20,
-          // height: 20,
+          margin: EdgeInsets.all(2),
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(7),
             // border: Border.all(width: 2),
             // shape: BoxShape.circle,
-            color: isSelected ? Color.fromARGB(255, 178, 176, 226) : Colors.white,
+            color: isSelected ? Colors.black : Colors.white,
             // col: Colors.white,
           ),
           child: IconButton(
-            icon: image ??   Icon(icon, size: 20, color: Colors.black),
+
+           style: ElevatedButton.styleFrom(
+            splashFactory: NoSplash.splashFactory,
+            // backgroundColor: isSelected ?Colors.indigo[100]: Colors.white ,
+            // foregroundColor: Colors.white,
+          ),
+
+            icon: image ??   Icon(icon, size: 20,color: isSelected? Colors.white:  Colors.black),
             onPressed: () {
               provider.setCurrentShape(isSelected ? ShapeType.none : shapeType);
             },
+
           ),
         );
       },
