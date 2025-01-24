@@ -14,7 +14,7 @@ class PointShape extends Shape {
     this.markerSize = 30.0,
     this.markerColor = Colors.red,
     this.markerIcon = Icons.location_on,
-  }) : super(points: points, type: ShapeType.point);
+  }) : super(points: points, type: ShapeType.line);
 
   @override
   double calculateDistance() {
@@ -122,5 +122,14 @@ class PointShape extends Shape {
     );
   }
 
- 
+  // Method to update point style
+  // void updateStyle({
+  //   double? size,
+  //   Color? color,
+  //   IconData? icon,
+  // }) {
+  //   if (size != null) this.markerSize = size;
+  //   if (color != null) this.markerColor = color;
+  //   if (icon != null) this.markerIcon = icon;
+  // }
 }
