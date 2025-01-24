@@ -9,16 +9,13 @@ import '../../domain/entities/shape.dart';
 import 'dart:math';
 import 'package:myapp/domain/entities/shape.dart';
 import 'package:myapp/core/enum/shape_type.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class ShapeDetailsPanel extends StatelessWidget {
   final MapController mapController;
-  final VoidCallback onPressed;
 
   const ShapeDetailsPanel({
     Key? key,
     required this.mapController,
-    required this.onPressed,
   }) : super(key: key);
 
   void _focusOnShape(Shape shape) {
@@ -48,166 +45,91 @@ class ShapeDetailsPanel extends StatelessWidget {
     );
 
     // Animate map to fit bounds
-    mapController.fitCamera( 
-        CameraFit.bounds(
-          bounds: bounds,
-          padding: const EdgeInsets.all(50.0),
-          maxZoom: 18,
-        ),
-        );
+     mapController.fitCamera(
+      CameraFit.bounds(
+        bounds: bounds,
+        padding: const EdgeInsets.all(50.0),
+        maxZoom: 18,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 17),
-
-      width: 300,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.white
-   
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric( vertical: 13),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Shapes Details',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                Container(
-                  height: 35,
-                  width: 35,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(8.0),
-
-                    color: Colors.blueGrey[50], // Set the grey color
-                  ),
-                  child: IconButton(
-                      icon:SvgPicture.asset('assets/menu.svg'),
-
-
-
-
-
-
-                      //  Icon(
-                      //   Icons.close,
-                      //   size: 18,
-                      // ),
-                      onPressed: onPressed),
-                ),
-              ],
+    return Positioned(
+      right: 0,
+      top: 0,
+      bottom: 0,
+      child: Container(
+        width: 300,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 5,
+              offset: const Offset(-2, 0),
             ),
-          ),
-          Expanded(
-            child: Consumer<DrawingProvider>(
-              builder: (context, provider, _) {
-                if (provider.shapes.isEmpty) {
-                  return   Center(
+          ],
+        ),
+        child: Consumer<DrawingProvider>(
+          builder: (context, provider, _) {
+            if (provider.shapes.isEmpty) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text('No shapes drawn yet'),
+                ),
+              );
+            }
+      
+            return ListView.builder(
+              itemCount: provider.shapes.length,
+              itemBuilder: (context, index) {
+                final shape = provider.shapes[index];
+                final details = shape.getDetails();
+      
+                return Card(
+                  margin: const EdgeInsets.all(8.0),
+                  child: InkWell(
+                    onTap: () => _focusOnShape(shape),
                     child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Image.asset('assets/nothing_found.png', width: double.infinity,),
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  itemCount: provider.shapes.length,
-                  itemBuilder: (context, index) {
-                    final shape = provider.shapes[index];
-                    final details = shape.getDetails();
-
-                    return Container(
-                      margin: EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
-                      // color: Colors.white,
-                      child: InkWell(
-                        onTap: () => _focusOnShape(shape),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric( horizontal: 10.0, vertical: 5),
-                          child: Column(
-                            // mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric (horizontal: 10, vertical:  5),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                    color: Colors.red,
-
-                                    ),
-                                    child: Icon(
-                                      size: 15, 
-                                      _getShapeIcon(shape),
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal:  8.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                      'Shape ${index + 1}',
-                                      style:   TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600]
-                                      ),
-                                    ),
-                                    Text(
-                                      '${details['type']}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    
-                                      ],
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  
-                                   IconButton(
-                                icon: const Icon(Icons.edit, 
-                                      size: 20, 
+                              Text(
+                                'Shape ${index + 1}: ${details['type']}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
                                 ),
-                                onPressed: () => provider.selectShape(shape),
                               ),
-                                  
-                                ],
+                              Icon(
+                                _getShapeIcon(shape),
+                                color: Colors.blue,
                               ),
-                              const Divider(color: Colors.white,),
-                              ...details.entries
-                                  .where((e) => e.key != 'type')
-                                  .map((e) => Padding(
-                                        padding: const EdgeInsets.symmetric( horizontal: 10,
-                                            vertical: 4.0),
-                                        child: Text(
-                                            '${_formatKey(e.key)}: ${e.value}'),
-                                      )),
-                             
                             ],
                           ),
-                        ),
+                          const Divider(),
+                          ...details.entries
+                              .where((e) => e.key != 'type')
+                              .map((e) => Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                    child: Text('${_formatKey(e.key)}: ${e.value}'),
+                                  )),
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 );
               },
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }
